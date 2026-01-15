@@ -3,6 +3,7 @@
     "description": "The JARVICE File Manager is a browser-based service that allows you to easily upload and download files from the Nimbix Cloud.",
     "author": "Nimbix, Inc.",
     "licensed": true,
+    "appdefversion": 2,
     "classifications": [
         "Unclassified/Development"
     ],
@@ -17,15 +18,22 @@
     ],
     "commands": {
         "filemanager": {
-            "path": "/usr/bin/sudo",
+            "path": "/usr/bin/entrypoint",
             "interactive": true,
             "name": "File Manager",
             "description": "Launch this service to upload and download files via your web browser.",
             "parameters": {
-                "start": {
-                    "name": "start",
+                "owncloud": {
+                    "name": "owncloud",
                     "type": "CONST",
-                    "value": "/usr/local/bin/owncloud-start.sh",
+                    "value": "/usr/bin/owncloud",
+                    "required": true,
+                    "positional": true
+                },
+		"server": {
+                    "name": "server",
+                    "type": "CONST",
+                    "value": "server",
                     "required": true,
                     "positional": true
                 }

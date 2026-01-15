@@ -1,13 +1,18 @@
-FROM nimbix/centos-base:7
+FROM owncloud/server:latest
 MAINTAINER Nimbix, Inc.
 
 COPY owncloud /tmp/owncloud
-RUN /tmp/owncloud/owncloud-install.sh --with-httpd && \
-    rm -rf /tmp/owncloud
-COPY owncloud-start.sh /usr/local/bin/owncloud-start.sh
 
-ENTRYPOINT ["/usr/local/bin/owncloud-start.sh"]
+RUN /tmp/owncloud/owncloud-install_v3.sh
 
-EXPOSE 443/tcp 22/tcp
+RUN apt-get install vim -y && apt-get clean
+
+#ENTRYPOINT ["/usr/bin/entrypoint"]
+#CMD ["/usr/bin/owncloud", "server"]
+
+#EXPOSE 8080/tcp
+
+EXPOSE 5902/tcp
 
 COPY ./NAE/AppDef.json /etc/NAE/AppDef.json
+

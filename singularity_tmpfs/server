@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -eo pipefail
+[[ "${DEBUG}" == "true" ]] && set -x
+
+if [[ -z "${OWNCLOUD_ENTRYPOINT_INITIALIZED}" ]]; then
+  for FILE in $(find /etc/entrypoint.d -iname "*.sh" | sort); do
+    # shellcheck disable=SC1090,SC2086
+    source ${FILE}
+  done
+fi
+
+if [[ -d "${OWNCLOUD_PRE_SERVER_PATH}" ]]; then
+  for FILE in $(find "${OWNCLOUD_PRE_SERVER_PATH}" -iname "*.sh" | sort); do
+    # shellcheck disable=SC1090,SC2086
+    source ${FILE}
+  done
+fi
+
+# Changes made to disable logs to bypass non /dev/stdout in singularity tmpfs
+# note that some are done at build time since this is not writable at runtime
+sed -i 's/^.*ErrorLog.*$//' /etc/apache2/sites-enabled/default.conf
+sed -i 's/^.*CustomLog.*$//' /etc/apache2/sites-enabled/default.conf
+# End tmpfs changes
+
+echo "Starting apache daemon..."
+# shellcheck disable=SC2093
+exec apachectl -f /etc/apache2/apache2.conf -DFOREGROUND
+
+if [[ -d "${OWNCLOUD_POST_SERVER_PATH}" ]]; then
+  for FILE in $(find "${OWNCLOUD_POST_SERVER_PATH}" -iname "*.sh" | sort); do
+    # shellcheck disable=SC1090,SC2086
+    source ${FILE}
+  done
+fi
